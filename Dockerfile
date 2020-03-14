@@ -17,7 +17,11 @@ RUN git checkout ${version}
 
 
 # Build
-RUN GO111MODULE=on make clean ghostunnel && \
+RUN GOOS=$(echo $TARGETPLATFORM | cut -f1 -d/) && \
+    GOARCH=$(echo $TARGETPLATFORM | cut -f2 -d/) && \
+    GOARM=$(echo $TARGETPLATFORM | cut -f3 -d/ | sed "s/v//" ) && \
+    GO111MODULE=on && \
+    CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build -ldflags '-X main.version=${VERSION}' -o ghostunnel && \
     cp ghostunnel /usr/bin/ghostunnel
 
 
